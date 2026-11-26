@@ -1,0 +1,27 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Ganti dengan UID akun admin (Firebase Console > Authentication > Users > kolom "User UID").
+    function isAdmin() {
+      return request.auth != null && request.auth.uid == "5N72ZwO86MOgsZ1ZSSyKrbqcxfL2";
+    }
+
+    // Data yang tampil di website: semua orang boleh membaca, hanya admin yang boleh mengubah.
+    match /pkbm/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Daftar lengkap siswa/i: hanya admin yang boleh membaca dan mengubah.
+    match /admin/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Semua yang lain ditolak.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
