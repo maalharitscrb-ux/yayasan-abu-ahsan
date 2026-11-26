@@ -120,6 +120,14 @@ tbody tr:last-child td { border-bottom: 0; }
 th { background: var(--mint); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--teal-dark); }
 td.empty { color: var(--muted); text-align: center; padding: 30px 16px; }
 
+/* pengumuman dan agenda */
+.news { display: grid; gap: 16px; }
+.news article { background: var(--white); border: 1px solid var(--line); border-left: 6px solid var(--gold); border-radius: 10px; padding: 18px 20px; display: grid; gap: 6px; }
+.news h3 { font-size: 20px; }
+.news time { font-size: 13px; font-weight: 600; color: var(--teal); }
+.news p { white-space: pre-line; color: var(--muted); }
+.agenda { display: grid; gap: 36px; }
+
 /* contact */
 .contact { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .box { background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 24px; display: grid; gap: 12px; align-content: start; }
@@ -155,6 +163,7 @@ footer a { color: #fff; }
     <nav aria-label="Menu utama">
       <a href="#tentang">Tentang</a>
       <a href="#kegiatan">Kegiatan</a>
+      <a href="#agenda">Agenda</a>
       <a href="#pkbm">PKBM</a>
       <a href="#kontak">Kontak</a>
     </nav>
@@ -165,11 +174,11 @@ footer a { color: #fff; }
   <section class="hero">
     <div class="wrap">
       <div>
-        <p class="eyebrow">Kota Cirebon</p>
-        <h1>Yayasan Abu Ahsan Cirebon</h1>
-        <p class="sub">Yayasan yang bergerak di bidang pendidikan, dakwah, dan pembinaan pemuda bagi masyarakat Cirebon.</p>
+        <p class="eyebrow" data-t="hero_eyebrow">Kota Cirebon</p>
+        <h1 data-t="hero_title">Yayasan Abu Ahsan Cirebon</h1>
+        <p class="sub" data-t="hero_sub">Yayasan yang bergerak di bidang pendidikan, dakwah, dan pembinaan pemuda bagi masyarakat Cirebon.</p>
         <div class="cta">
-          <a class="btn btn-gold" href="#pkbm">Pendaftaran PKBM 2026/2027</a>
+          <a class="btn btn-gold" href="#pkbm" data-t="hero_cta">Pendaftaran PKBM 2026/2027</a>
           <a class="btn btn-line" href="#kegiatan">Lihat kegiatan kami</a>
         </div>
       </div>
@@ -177,18 +186,28 @@ footer a { color: #fff; }
     </div>
   </section>
 
+  <section class="section" id="pengumuman" hidden>
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Pengumuman</p>
+        <h2>Pengumuman terbaru</h2>
+      </div>
+      <div class="news" id="list-pengumuman"></div>
+    </div>
+  </section>
+
   <section class="section" id="tentang">
     <div class="wrap about">
       <div>
         <p class="eyebrow">Tentang kami</p>
-        <h2>Pendidikan, dakwah, dan pembinaan pemuda dalam satu yayasan</h2>
+        <h2 data-t="about_title">Pendidikan, dakwah, dan pembinaan pemuda dalam satu yayasan</h2>
       </div>
       <div class="body">
-        <p>Yayasan Abu Ahsan Cirebon mengelola tiga kegiatan utama: PKBM, Majelis Taklim, dan Pembinaan Pemuda.</p>
-        <p>Kami terbuka bagi warga yang ingin belajar, mengaji, dan berkegiatan.</p>
+        <p data-t="about_p1">Yayasan Abu Ahsan Cirebon mengelola tiga kegiatan utama: PKBM, Majelis Taklim, dan Pembinaan Pemuda.</p>
+        <p data-t="about_p2">Kami terbuka bagi warga yang ingin belajar, mengaji, dan berkegiatan.</p>
         <div class="facts">
-          <div class="fact"><b>3 kegiatan</b><span>PKBM, Majelis Taklim, Pembinaan Pemuda</span></div>
-          <div class="fact"><b>Harjamukti, Cirebon</b><span>Argasunya, Kota Cirebon 45145</span></div>
+          <div class="fact"><b data-t="fact1_title">3 kegiatan</b><span data-t="fact1_text">PKBM, Majelis Taklim, Pembinaan Pemuda</span></div>
+          <div class="fact"><b data-t="fact2_title">Harjamukti, Cirebon</b><span data-t="fact2_text">Argasunya, Kota Cirebon 45145</span></div>
         </div>
       </div>
     </div>
@@ -198,29 +217,48 @@ footer a { color: #fff; }
     <div class="wrap">
       <div class="head">
         <p class="eyebrow">Kegiatan</p>
-        <h2>Tiga kegiatan yayasan</h2>
-        <p class="lead">Setiap kegiatan disusun untuk menjawab kebutuhan warga: belajar, beribadah, dan tumbuh sebagai generasi muda.</p>
+        <h2 data-t="kegiatan_title">Tiga kegiatan yayasan</h2>
+        <p class="lead" data-t="kegiatan_lead">Setiap kegiatan disusun untuk menjawab kebutuhan warga: belajar, beribadah, dan tumbuh sebagai generasi muda.</p>
       </div>
       <div class="grid4">
         <article class="card">
           <span class="no">01</span>
-          <h3>PKBM</h3>
-          <p>PKBM Salafiyatul Huda adalah Pusat Kegiatan Belajar Masyarakat yang membuka Paket B setara SMP dan Paket C setara SMA. Penerimaan siswa baru TP 2026/2027 sedang dibuka.</p>
-          <span class="tag">Pendaftaran dibuka</span>
+          <h3 data-t="card1_title">PKBM</h3>
+          <p data-t="card1_text">PKBM Salafiyatul Huda adalah Pusat Kegiatan Belajar Masyarakat yang membuka Paket B setara SMP dan Paket C setara SMA. Penerimaan siswa baru TP 2026/2027 sedang dibuka.</p>
+          <span class="tag" data-t="card1_tag">Pendaftaran dibuka</span>
           <a class="more" href="#pkbm">Lihat info pendaftaran</a>
         </article>
         <article class="card">
           <span class="no">02</span>
-          <h3>Majelis Taklim</h3>
-          <p>Pengajian dan kajian keislaman untuk masyarakat sekitar. Jadwal, tema, dan pemateri akan diumumkan di halaman ini dan di Instagram yayasan.</p>
-          <span class="tag">Jadwal segera diumumkan</span>
+          <h3 data-t="card2_title">Majelis Taklim</h3>
+          <p data-t="card2_text">Pengajian dan kajian keislaman untuk masyarakat sekitar. Jadwal, tema, dan pemateri akan diumumkan di halaman ini dan di Instagram yayasan.</p>
+          <span class="tag" data-t="card2_tag">Jadwal segera diumumkan</span>
         </article>
         <article class="card">
           <span class="no">03</span>
-          <h3>Pembinaan Pemuda</h3>
-          <p>Kegiatan keislaman dan kepemimpinan bagi pemuda, untuk belajar agama, berorganisasi, dan melatih kepemimpinan. Informasi kegiatan juga dibagikan lewat akun @genmi.id.</p>
-          <span class="tag">Keislaman &amp; kepemimpinan</span>
+          <h3 data-t="card3_title">Pembinaan Pemuda</h3>
+          <p data-t="card3_text">Kegiatan keislaman dan kepemimpinan bagi pemuda, untuk belajar agama, berorganisasi, dan melatih kepemimpinan. Informasi kegiatan juga dibagikan lewat akun @genmi.id.</p>
+          <span class="tag" data-t="card3_tag">Keislaman &amp; kepemimpinan</span>
         </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="agenda">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Agenda</p>
+        <h2>Jadwal Majelis Taklim dan kegiatan pemuda</h2>
+      </div>
+      <div class="agenda">
+        <div>
+          <h3 class="sub-h">Majelis Taklim</h3>
+          <div class="tbl"><table><thead><tr><th scope="col">Hari</th><th scope="col">Jam</th><th scope="col">Tema kajian</th><th scope="col">Pemateri</th><th scope="col">Tempat</th></tr></thead><tbody id="body-majelis"></tbody></table></div>
+        </div>
+        <div>
+          <h3 class="sub-h">Pembinaan Pemuda</h3>
+          <div class="tbl"><table><thead><tr><th scope="col">Tanggal</th><th scope="col">Kegiatan</th><th scope="col">Tempat</th><th scope="col">Keterangan</th></tr></thead><tbody id="body-pemuda"></tbody></table></div>
+        </div>
       </div>
     </div>
   </section>
@@ -241,21 +279,21 @@ footer a { color: #fff; }
       <div role="tabpanel" id="panel-daftar" aria-labelledby="tab-daftar">
         <div class="pkbm">
       <div>
-        <h3 class="sub-h">Penerimaan siswa baru Tahun Pelajaran 2026/2027</h3>
-        <p class="lead">PKBM Salafiyatul Huda (SDN Majasem 2) terakreditasi C. Pilih paket sesuai jenjang yang ingin Anda tempuh, lalu hubungi panitia untuk syarat dan jadwal pendaftaran.</p>
+        <h3 class="sub-h" data-t="pkbm_heading">Penerimaan siswa baru Tahun Pelajaran 2026/2027</h3>
+        <p class="lead" data-t="pkbm_lead">PKBM Salafiyatul Huda (SDN Majasem 2) terakreditasi C. Pilih paket sesuai jenjang yang ingin Anda tempuh, lalu hubungi panitia untuk syarat dan jadwal pendaftaran.</p>
         <div class="ppdb">
-          <b>Daftar sekarang</b>
-          <p>Hubungi panitia lewat WhatsApp. Kami akan menjawab pertanyaan seputar syarat, biaya, dan jadwal belajar.</p>
+          <b data-t="ppdb_title">Daftar sekarang</b>
+          <p data-t="ppdb_text">Hubungi panitia lewat WhatsApp. Kami akan menjawab pertanyaan seputar syarat, biaya, dan jadwal belajar.</p>
           <div class="cta">
-            <a class="btn btn-gold" href="https://wa.me/6285286612475">WhatsApp Abu Ahsan</a>
-            <a class="btn btn-line" href="https://wa.me/6289607768300">WhatsApp M. Ahsan</a>
+            <a class="btn btn-gold" href="https://wa.me/6285286612475" data-wa="btn-1">WhatsApp Abu Ahsan</a>
+            <a class="btn btn-line" href="https://wa.me/6289607768300" data-wa="btn-2">WhatsApp M. Ahsan</a>
           </div>
         </div>
       </div>
       <div class="paket">
-        <div class="p"><h3>Paket B</h3><span>Setara SMP</span></div>
-        <div class="p"><h3>Paket C</h3><span>Setara SMA</span></div>
-        <div class="fact"><b>Lokasi belajar</b><span>Jl. Perjuangan No. 32 Majasem, Kel. Karyamulya, Kec. Kesambi, Kota Cirebon</span></div>
+        <div class="p"><h3 data-t="paket_b_title">Paket B</h3><span data-t="paket_b_text">Setara SMP</span></div>
+        <div class="p"><h3 data-t="paket_c_title">Paket C</h3><span data-t="paket_c_text">Setara SMA</span></div>
+        <div class="fact"><b>Lokasi belajar</b><span data-t="lokasi_text">Jl. Perjuangan No. 32 Majasem, Kel. Karyamulya, Kec. Kesambi, Kota Cirebon</span></div>
       </div>
         </div>
       </div>
@@ -291,17 +329,17 @@ footer a { color: #fff; }
         <div class="box">
           <h3>Alamat dan kontak</h3>
           <ul>
-            <li><small>Alamat yayasan</small><strong>BTN Griya Bintang E2 Kedung Mendeng, Argasunya, Harjamukti, Kota Cirebon 45145</strong></li>
-            <li><small>Abu Ahsan</small><strong>0852 8661 2475</strong><a href="https://wa.me/6285286612475">Chat WhatsApp</a></li>
-            <li><small>M. Ahsan</small><strong>0896 0776 8300</strong><a href="https://wa.me/6289607768300">Chat WhatsApp</a></li>
+            <li><small>Alamat yayasan</small><strong data-t="alamat">BTN Griya Bintang E2 Kedung Mendeng, Argasunya, Harjamukti, Kota Cirebon 45145</strong></li>
+            <li><small data-wa="name-1">Abu Ahsan</small><strong data-wa="num-1">0852 8661 2475</strong><a data-wa="href-1" href="https://wa.me/6285286612475">Chat WhatsApp</a></li>
+            <li><small data-wa="name-2">M. Ahsan</small><strong data-wa="num-2">0896 0776 8300</strong><a data-wa="href-2" href="https://wa.me/6289607768300">Chat WhatsApp</a></li>
           </ul>
         </div>
         <div class="box">
           <h3>Media sosial</h3>
           <ul>
-            <li><small>Instagram yayasan</small><a href="https://www.instagram.com/yayasanabuahsan/">@yayasanabuahsan</a></li>
-            <li><small>Pembinaan pemuda</small><a href="https://www.instagram.com/genmi.id/">@genmi.id</a></li>
-            <li><small>Abu Ahsan Group</small><a href="https://www.instagram.com/abuahsangroup/">@abuahsangroup</a></li>
+            <li><small>Instagram yayasan</small><a data-ig="1" href="https://www.instagram.com/yayasanabuahsan/">@yayasanabuahsan</a></li>
+            <li><small>Pembinaan pemuda</small><a data-ig="2" href="https://www.instagram.com/genmi.id/">@genmi.id</a></li>
+            <li><small>Abu Ahsan Group</small><a data-ig="3" href="https://www.instagram.com/abuahsangroup/">@abuahsangroup</a></li>
           </ul>
         </div>
       </div>
@@ -312,7 +350,7 @@ footer a { color: #fff; }
 <footer>
   <div class="wrap">
     <span>&copy; 2026 Yayasan Abu Ahsan Cirebon</span>
-    <span>Instagram <a href="https://www.instagram.com/yayasanabuahsan/">@yayasanabuahsan</a> &middot; <a href="admin.html">Masuk admin</a></span>
+    <span>Instagram <a data-ig="1" href="https://www.instagram.com/yayasanabuahsan/">@yayasanabuahsan</a> &middot; <a href="admin.html">Masuk admin</a></span>
   </div>
 </footer>
 <script>
@@ -355,6 +393,61 @@ var PKBM_DATA = { pengurus: [], jadwal: [], siswaMode: 'count', siswa: [], siswa
   }
   window.renderPkbm = render;
   render(PKBM_DATA);
+
+  function each(sel, fn) { Array.prototype.forEach.call(document.querySelectorAll(sel), fn); }
+  function waLink(n) {
+    var d = String(n || '').replace(/\D/g, '');
+    if (d.charAt(0) === '0') d = '62' + d.slice(1);
+    return d.length >= 8 ? 'https://wa.me/' + d : '';
+  }
+  function igHandle(h) { return String(h || '').replace(/^@/, '').replace(/[^A-Za-z0-9._]/g, ''); }
+
+  /* Teks, kontak, agenda, dan pengumuman dari Firebase (dokumen pkbm/site). */
+  window.renderSite = function (site) {
+    site = site || {};
+    var t = site.texts || {};
+    each('[data-t]', function (el) {
+      var v = t[el.getAttribute('data-t')];
+      if (typeof v === 'string' && v.trim()) el.textContent = v.trim();
+    });
+    [1, 2].forEach(function (i) {
+      var name = String(t['wa' + i + '_name'] || '').trim();
+      var num = String(t['wa' + i + '_number'] || '').trim();
+      var link = waLink(num);
+      if (name) {
+        each('[data-wa="name-' + i + '"]', function (el) { el.textContent = name; });
+        each('[data-wa="btn-' + i + '"]', function (el) { el.textContent = 'WhatsApp ' + name; });
+      }
+      if (link) {
+        each('[data-wa="num-' + i + '"]', function (el) { el.textContent = num; });
+        each('[data-wa="href-' + i + '"], [data-wa="btn-' + i + '"]', function (el) { el.setAttribute('href', link); });
+      }
+    });
+    [1, 2, 3].forEach(function (i) {
+      var h = igHandle(t['ig' + i]);
+      if (!h) return;
+      each('[data-ig="' + i + '"]', function (el) {
+        el.textContent = '@' + h;
+        el.setAttribute('href', 'https://www.instagram.com/' + h + '/');
+      });
+    });
+    fill('body-majelis', site.majelis || [], ['hari', 'jam', 'tema', 'pemateri', 'tempat'], false, 'Jadwal Majelis Taklim akan diumumkan di sini.');
+    fill('body-pemuda', site.pemuda || [], ['tanggal', 'kegiatan', 'tempat', 'ket'], false, 'Agenda kegiatan pemuda akan diumumkan di sini.');
+
+    var list = document.getElementById('list-pengumuman'), sec = document.getElementById('pengumuman');
+    var items = site.pengumuman || [];
+    clear(list);
+    items.forEach(function (it) {
+      var a = document.createElement('article');
+      var h = document.createElement('h3'); h.textContent = it.judul || '';
+      a.appendChild(h);
+      if (it.tanggal) { var tm = document.createElement('time'); tm.textContent = it.tanggal; a.appendChild(tm); }
+      if (it.isi) { var p = document.createElement('p'); p.textContent = it.isi; a.appendChild(p); }
+      list.appendChild(a);
+    });
+    sec.hidden = !items.length;
+  };
+  window.renderSite({});
 
   var tabs = Array.prototype.slice.call(document.querySelectorAll('.tabs [role="tab"]'));
   function select(tab, focus) {
