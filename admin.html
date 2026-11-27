@@ -112,7 +112,7 @@ td textarea { min-height: 64px; }
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp, collection, getDocs, addDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { firebaseConfig, configReady } from "./firebase-config.js";
 import { GROUPS, LISTS } from "./site-fields.js";
 
@@ -123,13 +123,16 @@ const PANELS = [
   { id: "tentang", title: "Tentang", groups: ["tentang"] },
   { id: "kegiatan", title: "Kegiatan", groups: ["kegiatan"] },
   { id: "agenda", title: "Agenda", lists: [["majelis", "Jadwal Majelis Taklim"], ["pemuda", "Agenda Pembinaan Pemuda"]] },
+  { id: "galeri", title: "Galeri", gallery: true },
+  { id: "berita", title: "Berita", lists: [["berita", "Berita dan artikel pilihan"]], note: "Tambahkan judul, sumber, dan tautan ke berita asli (NU Online, Kemenag, ANTARA, dll). Website hanya menampilkan judul, ringkasan singkat, dan tautan, bukan isi lengkap berita." },
+  { id: "pustaka", title: "Pustaka", lists: [["buku", "Daftar buku dan bahan bacaan"]] },
   { id: "pengumuman", title: "Pengumuman", lists: [["pengumuman", "Daftar pengumuman"]], note: "Pengumuman tampil di bagian atas halaman depan. Kosongkan semua baris untuk menyembunyikan bagian ini." },
   { id: "pkbm", title: "PKBM", groups: ["pkbm"], lists: [["pengurus", "Pengurus PKBM"], ["siswa", "Siswa/i"], ["jadwal", "Jadwal pembelajaran PKBM"]], siswaOption: true },
   { id: "kontak", title: "Kontak", groups: ["kontak"] }
 ];
 
 const values = {};   // teks yang sedang diedit, per kunci
-const lists = { pengurus: [], siswa: [], jadwal: [], majelis: [], pemuda: [], pengumuman: [] };
+const lists = { pengurus: [], siswa: [], jadwal: [], majelis: [], pemuda: [], pengumuman: [], berita: [], buku: [] };
 let dirty = false;
 
 function show(el, text, kind) { el.className = "msg " + kind; el.textContent = text; }
@@ -178,6 +181,83 @@ function renderList(key) {
   table.appendChild(tbody);
 }
 
+let dbRef = null;
+function buildGallery() {
+  const card = document.createElement("section"); card.className = "card";
+  const h = document.createElement("h2"); h.textContent = "Galeri foto"; h.style.fontSize = "22px"; card.appendChild(h);
+  const info = document.createElement("div"); info.className = "msg info";
+  info.textContent = "Foto dikecilkan otomatis (maksimal 1200 px) lalu langsung tersimpan saat tombol Unggah ditekan, tanpa menunggu Simpan ke website.";
+  card.appendChild(info);
+  const grid = document.createElement("div"); grid.className = "fields";
+  const mk = (id, label, ph) => { const l = document.createElement("label"); l.htmlFor = id; l.appendChild(document.createTextNode(label)); const i = document.createElement("input"); i.type = "text"; i.id = id; if (ph) i.placeholder = ph; l.appendChild(i); grid.appendChild(l); };
+  const fl = document.createElement("label"); fl.className = "full"; fl.htmlFor = "g-file"; fl.appendChild(document.createTextNode("Pilih foto (JPG/PNG)"));
+  const fi = document.createElement("input"); fi.type = "file"; fi.id = "g-file"; fi.accept = "image/jpeg,image/png,image/webp"; fl.appendChild(fi); grid.appendChild(fl);
+  mk("g-judul", "Judul foto", "Contoh: Kajian Ahad pagi");
+  mk("g-kat", "Kategori", "Contoh: Majelis Taklim");
+  const kl = document.createElement("label"); kl.className = "full"; kl.htmlFor = "g-ket"; kl.appendChild(document.createTextNode("Keterangan (opsional)"));
+  const ki = document.createElement("input"); ki.type = "text"; ki.id = "g-ket"; kl.appendChild(ki); grid.appendChild(kl);
+  card.appendChild(grid);
+  const row = document.createElement("div"); row.className = "row";
+  const up = document.createElement("button"); up.type = "button"; up.className = "btn gold"; up.id = "g-up"; up.textContent = "Unggah foto";
+  const gm = document.createElement("span"); gm.id = "g-msg"; gm.setAttribute("role", "status");
+  row.appendChild(up); row.appendChild(gm); card.appendChild(row);
+  const list = document.createElement("div"); list.id = "g-list"; list.className = "fields"; card.appendChild(list);
+  up.addEventListener("click", async () => {
+    const file = fi.files[0], msg = $("g-msg");
+    if (!file) { show(msg, "Pilih foto dulu.", "err"); return; }
+    up.disabled = true; show(msg, "Mengunggah...", "info");
+    try {
+      const foto = await shrink(file);
+      await addDoc(collection(dbRef, "galeri"), {
+        foto, judul: $("g-judul").value.trim(), kategori: $("g-kat").value.trim(), keterangan: $("g-ket").value.trim(), createdAt: serverTimestamp()
+      });
+      fi.value = ""; $("g-judul").value = ""; $("g-ket").value = "";
+      show(msg, "Foto tersimpan dan tampil di website.", "ok");
+      await loadGallery();
+    } catch (err) {
+      show(msg, err && err.code === "permission-denied" ? "Ditolak. Pastikan aturan Firestore terbaru sudah dipublikasikan (ada bagian galeri)." : (err && err.message) || "Gagal mengunggah.", "err");
+    } finally { up.disabled = false; }
+  });
+  return card;
+}
+function shrink(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let w = img.width, h = img.height; const max = 1200;
+      if (Math.max(w, h) > max) { const k = max / Math.max(w, h); w = Math.round(w * k); h = Math.round(h * k); }
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      c.getContext("2d").drawImage(img, 0, 0, w, h);
+      let q = 0.82, out = c.toDataURL("image/jpeg", q);
+      while (out.length > 700000 && q > 0.35) { q -= 0.1; out = c.toDataURL("image/jpeg", q); }
+      if (out.length > 900000) reject(new Error("Foto terlalu besar, pilih foto yang lebih kecil."));
+      else resolve(out);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("File bukan gambar yang valid.")); };
+    img.src = url;
+  });
+}
+async function loadGallery() {
+  const list = $("g-list"); if (!list) return;
+  while (list.firstChild) list.removeChild(list.firstChild);
+  const snap = await getDocs(query(collection(dbRef, "galeri"), orderBy("createdAt", "desc")));
+  if (snap.empty) { const p = document.createElement("p"); p.className = "hint full"; p.textContent = "Belum ada foto."; list.appendChild(p); return; }
+  snap.forEach((d) => {
+    const x = d.data(), fig = document.createElement("div");
+    fig.style.cssText = "display:grid;gap:6px;border:1px solid var(--line);border-radius:10px;padding:8px";
+    const im = document.createElement("img"); im.src = x.foto; im.alt = x.judul || "Foto"; im.style.cssText = "width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:6px";
+    const t = document.createElement("span"); t.textContent = [x.kategori, x.judul].filter(Boolean).join(" - ") || "(tanpa judul)"; t.className = "hint";
+    const del = document.createElement("button"); del.type = "button"; del.className = "btn danger small"; del.textContent = "Hapus foto";
+    del.addEventListener("click", async () => {
+      del.disabled = true;
+      try { await deleteDoc(doc(dbRef, "galeri", d.id)); await loadGallery(); }
+      catch (e) { del.disabled = false; show($("g-msg"), "Gagal menghapus.", "err"); }
+    });
+    fig.appendChild(im); fig.appendChild(t); fig.appendChild(del); list.appendChild(fig);
+  });
+}
+
 function buildPanels() {
   const tabs = $("tabs"), panels = $("panels");
   PANELS.forEach((p, idx) => {
@@ -211,6 +291,7 @@ function buildPanels() {
       card.appendChild(grid); panel.appendChild(card);
     });
 
+    if (p.gallery) panel.appendChild(buildGallery());
     if (p.note) { const n = document.createElement("div"); n.className = "msg info"; n.textContent = p.note; panel.appendChild(n); }
 
     (p.lists || []).forEach(([key, title]) => {
@@ -276,6 +357,7 @@ if (!configReady()) {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+  dbRef = db;
   let built = false;
 
   async function loadAll() {
@@ -294,11 +376,14 @@ if (!configReady()) {
     lists.majelis = copy(site.majelis);
     lists.pemuda = copy(site.pemuda);
     lists.pengumuman = copy(site.pengumuman);
+    lists.berita = copy(site.berita);
+    lists.buku = copy(site.buku);
     if (!built) { buildPanels(); built = true; }
     else GROUPS.forEach((g) => g.fields.forEach((f) => { $("f-" + f.key).value = values[f.key]; }));
     $("siswaPublic").checked = data.siswaMode === "names";
     Object.keys(lists).forEach(renderList);
     dirty = false;
+    try { await loadGallery(); } catch (e) { /* aturan galeri belum dipublikasikan */ }
   }
 
   onAuthStateChanged(auth, async (user) => {
@@ -360,6 +445,8 @@ if (!configReady()) {
       const majelis = clean(lists.majelis, "majelis");
       const pemuda = clean(lists.pemuda, "pemuda");
       const pengumuman = clean(lists.pengumuman, "pengumuman");
+      const berita = clean(lists.berita, "berita");
+      const buku = clean(lists.buku, "buku");
       const siswaCount = {};
       siswa.forEach((s) => { const k = s.paket || "Lainnya"; siswaCount[k] = (siswaCount[k] || 0) + 1; });
       const showNames = $("siswaPublic").checked;
@@ -370,9 +457,9 @@ if (!configReady()) {
         siswa: showNames ? siswa : [],
         updatedAt: serverTimestamp()
       });
-      await setDoc(doc(db, "pkbm", "site"), { texts, majelis, pemuda, pengumuman, updatedAt: serverTimestamp() });
+      await setDoc(doc(db, "pkbm", "site"), { texts, majelis, pemuda, pengumuman, berita, buku, updatedAt: serverTimestamp() });
       lists.pengurus = pengurus; lists.jadwal = jadwal; lists.siswa = siswa;
-      lists.majelis = majelis; lists.pemuda = pemuda; lists.pengumuman = pengumuman;
+      lists.majelis = majelis; lists.pemuda = pemuda; lists.pengumuman = pengumuman; lists.berita = berita; lists.buku = buku;
       Object.keys(lists).forEach(renderList);
       dirty = false;
       show($("saveMsg"), "Tersimpan. Website sudah diperbarui.", "ok");

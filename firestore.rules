@@ -14,6 +14,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Foto galeri: semua orang boleh membaca, hanya admin yang boleh mengubah.
+    match /galeri/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Daftar lengkap siswa/i: hanya admin yang boleh membaca dan mengubah.
     match /admin/{docId} {
       allow read, write: if isAdmin();

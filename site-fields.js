@@ -76,5 +76,7 @@ export const LISTS = {
   jadwal: { cols: [["hari", "Hari"], ["jam", "Jam"], ["mapel", "Mata pelajaran"], ["paket", "Paket", ["", "Paket B", "Paket C"]], ["pengajar", "Pengajar"]] },
   majelis: { cols: [["hari", "Hari"], ["jam", "Jam"], ["tema", "Tema kajian"], ["pemateri", "Pemateri"], ["tempat", "Tempat"]] },
   pemuda: { cols: [["tanggal", "Tanggal"], ["kegiatan", "Kegiatan"], ["tempat", "Tempat"], ["ket", "Keterangan"]] },
+  berita: { cols: [["judul", "Judul"], ["tanggal", "Tanggal"], ["sumber", "Sumber (mis. NU Online)"], ["link", "Tautan berita"], ["ringkasan", "Ringkasan singkat", "textarea"]] },
+  buku: { cols: [["judul", "Judul buku"], ["penulis", "Penulis"], ["deskripsi", "Deskripsi", "textarea"], ["link", "Tautan buku"]] },
   pengumuman: { cols: [["judul", "Judul"], ["tanggal", "Tanggal"], ["isi", "Isi pengumuman", "textarea"]] }
 };

@@ -128,6 +128,35 @@ td.empty { color: var(--muted); text-align: center; padding: 30px 16px; }
 .news p { white-space: pre-line; color: var(--muted); }
 .agenda { display: grid; gap: 36px; }
 
+/* galeri, sholat, berita, pustaka */
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.gallery figure { margin: 0; background: var(--white); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: grid; }
+.gallery button { border: 0; padding: 0; background: #E9E1C8; cursor: zoom-in; display: block; }
+.gallery img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
+.gallery figcaption { padding: 12px 14px; display: grid; gap: 2px; }
+.gallery figcaption b { font-family: var(--display); font-size: 17px; }
+.gallery figcaption span { font-size: 14px; color: var(--muted); }
+.gallery figcaption small { font-size: 12px; font-weight: 600; color: var(--teal); letter-spacing: .06em; text-transform: uppercase; }
+dialog.lightbox { border: 0; border-radius: 12px; padding: 0; max-width: min(960px, 94vw); background: #111; color: #fff; }
+dialog.lightbox::backdrop { background: rgba(0,0,0,.75); }
+dialog.lightbox img { display: block; max-width: 100%; max-height: 78vh; margin: 0 auto; }
+dialog.lightbox div { padding: 12px 16px; display: flex; gap: 12px; justify-content: space-between; align-items: center; }
+dialog.lightbox button { background: var(--gold); border: 0; border-radius: 8px; padding: 8px 14px; font-weight: 600; cursor: pointer; }
+.prayer { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
+.prayer div { background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 16px 10px; text-align: center; display: grid; gap: 2px; }
+.prayer div.next { background: var(--ink); color: #fff; border-color: var(--ink); }
+.prayer span { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--teal); }
+.prayer div.next span { color: var(--gold); }
+.prayer b { font-family: var(--display); font-size: 28px; }
+.note { color: var(--muted); font-size: 14px; }
+.links { display: flex; flex-wrap: wrap; gap: 10px; }
+.news article a.more { justify-self: start; }
+.books { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.books article { background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 6px; align-content: start; }
+.books h3 { font-size: 19px; }
+.books p { margin: 0; color: var(--muted); font-size: 15px; }
+
+
 /* contact */
 .contact { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .box { background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 24px; display: grid; gap: 12px; align-content: start; }
@@ -163,7 +192,10 @@ footer a { color: #fff; }
     <nav aria-label="Menu utama">
       <a href="#tentang">Tentang</a>
       <a href="#kegiatan">Kegiatan</a>
+      <a href="#galeri">Galeri</a>
       <a href="#agenda">Agenda</a>
+      <a href="#berita">Berita</a>
+      <a href="#pustaka">Pustaka</a>
       <a href="#pkbm">PKBM</a>
       <a href="#kontak">Kontak</a>
     </nav>
@@ -244,6 +276,22 @@ footer a { color: #fff; }
     </div>
   </section>
 
+  <section class="section" id="galeri">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Galeri</p>
+        <h2>Dokumentasi kegiatan dan informasi</h2>
+      </div>
+      <div class="gallery" id="list-galeri"></div>
+      <p class="note" id="galeri-empty">Foto kegiatan akan ditampilkan di sini.</p>
+    </div>
+  </section>
+
+  <dialog class="lightbox" id="lightbox" aria-label="Foto">
+    <img id="lb-img" alt="">
+    <div><span id="lb-cap"></span><button type="button" id="lb-close">Tutup</button></div>
+  </dialog>
+
   <section class="section" id="agenda">
     <div class="wrap">
       <div class="head">
@@ -259,6 +307,53 @@ footer a { color: #fff; }
           <h3 class="sub-h">Pembinaan Pemuda</h3>
           <div class="tbl"><table><thead><tr><th scope="col">Tanggal</th><th scope="col">Kegiatan</th><th scope="col">Tempat</th><th scope="col">Keterangan</th></tr></thead><tbody id="body-pemuda"></tbody></table></div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band" id="sholat">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Jadwal sholat</p>
+        <h2>Jadwal sholat Kota Cirebon hari ini</h2>
+      </div>
+      <p class="note" id="prayer-date">Memuat jadwal...</p>
+      <div class="prayer" id="prayer" aria-live="polite"></div>
+      <p class="note" style="margin-top:14px">Perhitungan mengikuti metode Kementerian Agama RI (sumber: Aladhan). Untuk jadwal resmi dan kota lain, lihat <a href="https://bimasislam.kemenag.go.id/jadwalshalat" target="_blank" rel="noopener">Bimas Islam Kemenag</a>.</p>
+    </div>
+  </section>
+
+  <section class="section" id="berita">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Berita</p>
+        <h2>Berita dan artikel pilihan</h2>
+      </div>
+      <div class="news" id="list-berita"></div>
+      <p class="note" id="berita-empty">Berita pilihan akan ditampilkan di sini.</p>
+      <h3 class="sub-h" style="margin-top:28px">Baca berita terkini</h3>
+      <div class="links">
+        <a class="btn btn-line" href="https://www.nu.or.id/" target="_blank" rel="noopener">NU Online</a>
+        <a class="btn btn-line" href="https://kemenag.go.id/" target="_blank" rel="noopener">Kemenag RI</a>
+        <a class="btn btn-line" href="https://www.antaranews.com/" target="_blank" rel="noopener">ANTARA (nasional)</a>
+        <a class="btn btn-line" href="https://www.antaranews.com/jabar" target="_blank" rel="noopener">ANTARA Jawa Barat</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band" id="pustaka">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Pustaka</p>
+        <h2>Buku dan bahan bacaan</h2>
+      </div>
+      <div class="books" id="list-buku"></div>
+      <p class="note" id="buku-empty">Daftar buku akan ditampilkan di sini.</p>
+      <h3 class="sub-h" style="margin-top:28px">Pustaka digital</h3>
+      <div class="links">
+        <a class="btn btn-line" href="https://quran.kemenag.go.id/" target="_blank" rel="noopener">Al-Qur'an Kemenag</a>
+        <a class="btn btn-line" href="https://www.nu.or.id/" target="_blank" rel="noopener">Khazanah NU Online</a>
+        <a class="btn btn-line" href="https://kemenag.go.id/" target="_blank" rel="noopener">Kemenag RI</a>
       </div>
     </div>
   </section>
@@ -446,8 +541,103 @@ var PKBM_DATA = { pengurus: [], jadwal: [], siswaMode: 'count', siswa: [], siswa
       list.appendChild(a);
     });
     sec.hidden = !items.length;
+
+    var bl = document.getElementById('list-berita'), bs = site.berita || [];
+    clear(bl);
+    bs.forEach(function (it) {
+      var a = document.createElement('article');
+      var h = document.createElement('h3'); h.textContent = it.judul || ''; a.appendChild(h);
+      var meta = [it.tanggal, it.sumber].filter(Boolean).join(' · ');
+      if (meta) { var tm = document.createElement('time'); tm.textContent = meta; a.appendChild(tm); }
+      if (it.ringkasan) { var p = document.createElement('p'); p.textContent = it.ringkasan; a.appendChild(p); }
+      var u = safeUrl(it.link);
+      if (u) { var l = document.createElement('a'); l.className = 'more'; l.href = u; l.target = '_blank'; l.rel = 'noopener'; l.textContent = 'Baca selengkapnya'; a.appendChild(l); }
+      bl.appendChild(a);
+    });
+    document.getElementById('berita-empty').hidden = !!bs.length;
+
+    var kl = document.getElementById('list-buku'), ks = site.buku || [];
+    clear(kl);
+    ks.forEach(function (it) {
+      var a = document.createElement('article');
+      var h = document.createElement('h3'); h.textContent = it.judul || ''; a.appendChild(h);
+      if (it.penulis) { var tm = document.createElement('time'); tm.style.cssText = 'font-size:13px;font-weight:600;color:var(--teal)'; tm.textContent = it.penulis; a.appendChild(tm); }
+      if (it.deskripsi) { var p = document.createElement('p'); p.textContent = it.deskripsi; a.appendChild(p); }
+      var u = safeUrl(it.link);
+      if (u) { var l = document.createElement('a'); l.className = 'more'; l.href = u; l.target = '_blank'; l.rel = 'noopener'; l.textContent = 'Buka buku'; a.appendChild(l); }
+      kl.appendChild(a);
+    });
+    document.getElementById('buku-empty').hidden = !!ks.length;
   };
   window.renderSite({});
+
+  function safeUrl(u) {
+    u = String(u || '').trim();
+    if (!u) return '';
+    if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+    return /^https?:\/\/[^\s]+$/i.test(u) ? u : '';
+  }
+
+  /* Galeri (koleksi Firestore "galeri"). */
+  window.renderGaleri = function (items) {
+    var box = document.getElementById('list-galeri');
+    clear(box);
+    items.forEach(function (it) {
+      if (!/^data:image\/(jpeg|png|webp);base64,/.test(it.foto || '')) return;
+      var f = document.createElement('figure');
+      var b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', 'Perbesar foto: ' + (it.judul || ''));
+      var img = document.createElement('img'); img.src = it.foto; img.alt = it.judul || 'Foto kegiatan'; img.loading = 'lazy';
+      b.appendChild(img);
+      b.addEventListener('click', function () {
+        document.getElementById('lb-img').src = it.foto;
+        document.getElementById('lb-img').alt = it.judul || '';
+        document.getElementById('lb-cap').textContent = [it.judul, it.keterangan].filter(Boolean).join(' - ');
+        document.getElementById('lightbox').showModal();
+      });
+      f.appendChild(b);
+      var c = document.createElement('figcaption');
+      if (it.kategori) { var k = document.createElement('small'); k.textContent = it.kategori; c.appendChild(k); }
+      if (it.judul) { var t = document.createElement('b'); t.textContent = it.judul; c.appendChild(t); }
+      if (it.keterangan) { var d = document.createElement('span'); d.textContent = it.keterangan; c.appendChild(d); }
+      f.appendChild(c); box.appendChild(f);
+    });
+    document.getElementById('galeri-empty').hidden = !!box.children.length;
+  };
+  (function () {
+    var dlg = document.getElementById('lightbox');
+    document.getElementById('lb-close').addEventListener('click', function () { dlg.close(); });
+    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+  })();
+
+  /* Jadwal sholat Kota Cirebon (Aladhan, metode Kemenag RI). */
+  (function () {
+    var box = document.getElementById('prayer'), info = document.getElementById('prayer-date');
+    var names = [['Imsak', 'Imsak'], ['Fajr', 'Subuh'], ['Sunrise', 'Terbit'], ['Dhuhr', 'Dzuhur'], ['Asr', 'Ashar'], ['Maghrib', 'Maghrib'], ['Isha', 'Isya']];
+    var url = 'https://api.aladhan.com/v1/timings?latitude=-6.732&longitude=108.552&method=20&timezonestring=Asia/Jakarta';
+    function show(t, dateText) {
+      clear(box);
+      var now = new Date(), wib = new Date(now.getTime() + (now.getTimezoneOffset() + 420) * 60000);
+      var cur = wib.getHours() * 60 + wib.getMinutes(), next = -1;
+      names.forEach(function (n, i) {
+        if (n[0] === 'Imsak' || n[0] === 'Sunrise') return;
+        var p = String(t[n[0]] || '').slice(0, 5).split(':');
+        if (next < 0 && (+p[0]) * 60 + (+p[1]) > cur) next = i;
+      });
+      names.forEach(function (n, i) {
+        var d = document.createElement('div'); if (i === next) d.className = 'next';
+        var s = document.createElement('span'); s.textContent = n[1];
+        var b = document.createElement('b'); b.textContent = String(t[n[0]] || '--:--').slice(0, 5);
+        d.appendChild(s); d.appendChild(b); box.appendChild(d);
+      });
+      info.textContent = dateText + ' (WIB)';
+    }
+    fetch(url).then(function (r) { return r.json(); }).then(function (j) {
+      var d = j.data, g = d.date.gregorian, h = d.date.hijri;
+      show(d.timings, g.weekday.en + ', ' + g.date + ' / ' + h.day + ' ' + h.month.en + ' ' + h.year + ' H');
+    }).catch(function () {
+      info.textContent = 'Jadwal belum bisa dimuat. Silakan buka Bimas Islam Kemenag di bawah.';
+    });
+  })();
 
   var tabs = Array.prototype.slice.call(document.querySelectorAll('.tabs [role="tab"]'));
   function select(tab, focus) {
