@@ -50,6 +50,11 @@ nav a:hover { border-bottom-color: var(--gold); }
 
 /* hero */
 .hero { background: var(--ink); color: #fff; position: relative; overflow: hidden; }
+.hero-bg { position: absolute; inset: 0; z-index: 0; }
+.hero-bg .hs { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.4s ease; }
+.hero-bg .hs.on { opacity: 1; }
+.hero-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(18,18,18,.88) 0%, rgba(18,18,18,.7) 55%, rgba(18,18,18,.55) 100%); }
+.hero .wrap { position: relative; z-index: 1; }
 .hero .wrap { display: grid; grid-template-columns: 1.15fr .85fr; gap: 40px; align-items: center; padding-top: 72px; padding-bottom: 72px; }
 .hero .eyebrow { color: var(--gold); }
 .hero h1 { font-size: clamp(34px, 5vw, 54px); margin: 14px 0 18px; }
@@ -212,6 +217,7 @@ footer a { color: #fff; }
 
 <main id="atas">
   <section class="hero">
+    <div class="hero-bg" id="hero-bg" aria-hidden="true"></div>
     <div class="wrap">
       <div>
         <p class="eyebrow" data-t="hero_eyebrow">Kota Cirebon</p>
@@ -418,7 +424,7 @@ footer a { color: #fff; }
       <div role="tabpanel" id="panel-jadwal" aria-labelledby="tab-jadwal">
         <h3 class="sub-h">Jadwal pembelajaran</h3>
         <p class="panel-note">Jadwal kegiatan belajar mengajar (KBM) PKBM Salafiyatul Huda.</p>
-        <div class="tbl"><table><thead><tr><th scope="col">Hari</th><th scope="col">Jam</th><th scope="col">Mata pelajaran</th><th scope="col">Paket</th><th scope="col">Pengajar</th></tr></thead><tbody id="body-jadwal"></tbody></table></div>
+        <div class="tbl"><table><thead><tr><th scope="col">Hari</th><th scope="col">Jam</th><th scope="col">Mata pelajaran</th><th scope="col">Paket</th><th scope="col">Kelas</th><th scope="col">Pengajar</th></tr></thead><tbody id="body-jadwal"></tbody></table></div>
       </div>
     </div>
   </section>
@@ -486,7 +492,7 @@ var PKBM_DATA = { pengurus: [], jadwal: [], siswaMode: 'count', siswa: [], siswa
   function render(d) {
     d = d || {};
     fill('body-pengurus', d.pengurus || [], ['nama', 'jabatan'], true, 'Daftar pengurus akan ditampilkan di sini.');
-    fill('body-jadwal', d.jadwal || [], ['hari', 'jam', 'mapel', 'paket', 'pengajar'], false, 'Jadwal pembelajaran akan ditampilkan di sini.');
+    fill('body-jadwal', d.jadwal || [], ['hari', 'jam', 'mapel', 'paket', 'kelas', 'pengajar'], false, 'Jadwal pembelajaran akan ditampilkan di sini.');
     if (d.siswaMode === 'names' && (d.siswa || []).length) {
       fill('body-siswa', d.siswa, ['nama', 'paket', 'kelas'], true, '');
     } else {
@@ -589,7 +595,27 @@ var PKBM_DATA = { pengurus: [], jadwal: [], siswaMode: 'count', siswa: [], siswa
   }
 
   /* Galeri (koleksi Firestore "galeri"). */
+  var heroTimer = null;
+  window.renderHero = function (urls) {
+    var bg = document.getElementById('hero-bg');
+    clear(bg);
+    if (heroTimer) { clearInterval(heroTimer); heroTimer = null; }
+    urls = urls.filter(function (u) { return /^data:image\/(jpeg|png|webp);base64,/.test(u); });
+    if (!urls.length) return;
+    var slides = urls.map(function (u, i) {
+      var d = document.createElement('div'); d.className = 'hs' + (i === 0 ? ' on' : '');
+      d.style.backgroundImage = 'url("' + u + '")'; bg.appendChild(d); return d;
+    });
+    var cur = 0;
+    var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (slides.length > 1 && !still) {
+      heroTimer = setInterval(function () {
+        slides[cur].classList.remove('on'); cur = (cur + 1) % slides.length; slides[cur].classList.add('on');
+      }, 6000);
+    }
+  };
   window.renderGaleri = function (items) {
+    window.renderHero(items.filter(function (it) { return it.hero; }).map(function (it) { return it.foto; }));
     var box = document.getElementById('list-galeri');
     clear(box);
     items.forEach(function (it) {

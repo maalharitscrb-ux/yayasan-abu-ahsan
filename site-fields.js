@@ -73,7 +73,7 @@ export const GROUPS = [
 export const LISTS = {
   pengurus: { cols: [["nama", "Nama"], ["jabatan", "Jabatan"]] },
   siswa: { cols: [["nama", "Nama"], ["paket", "Paket", ["", "Paket B", "Paket C"]], ["kelas", "Kelas"]] },
-  jadwal: { cols: [["hari", "Hari"], ["jam", "Jam"], ["mapel", "Mata pelajaran"], ["paket", "Paket", ["", "Paket B", "Paket C"]], ["pengajar", "Pengajar"]] },
+  jadwal: { cols: [["hari", "Hari"], ["jam", "Jam"], ["mapel", "Mata pelajaran"], ["paket", "Paket", ["", "Paket B", "Paket C"]], ["kelas", "Kelas"], ["pengajar", "Pengajar"]] },
   majelis: { cols: [["hari", "Hari"], ["jam", "Jam"], ["tema", "Tema kajian"], ["pemateri", "Pemateri"], ["tempat", "Tempat"]] },
   pemuda: { cols: [["tanggal", "Tanggal"], ["kegiatan", "Kegiatan"], ["tempat", "Tempat"], ["ket", "Keterangan"]] },
   berita: { cols: [["judul", "Judul"], ["tanggal", "Tanggal"], ["sumber", "Sumber (mis. Kemenag)"], ["link", "Tautan berita"], ["ringkasan", "Ringkasan singkat", "textarea"]] },
