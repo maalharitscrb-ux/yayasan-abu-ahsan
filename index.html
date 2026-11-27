@@ -129,7 +129,15 @@ td.empty { color: var(--muted); text-align: center; padding: 30px 16px; }
 .agenda { display: grid; gap: 36px; }
 
 /* galeri, sholat, berita, pustaka */
-.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.gallery-wrap { position: relative; }
+.gallery { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; padding: 4px 2px 14px; scrollbar-width: thin; }
+.gallery figure { flex: 0 0 min(300px, 80%); scroll-snap-align: start; }
+.gal-nav { position: absolute; top: 38%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--ink); color: var(--gold); font-size: 22px; line-height: 1; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.3); z-index: 2; }
+.gal-nav:hover { background: #2B2B2B; }
+.gal-nav.prev { left: -6px; } .gal-nav.next { right: -6px; }
+.clock { font-family: var(--display); font-size: clamp(34px, 7vw, 52px); font-weight: 700; line-height: 1.1; }
+.clock small { font-family: var(--body); font-size: 15px; font-weight: 600; color: var(--teal); margin-left: 8px; letter-spacing: .06em; }
+.clockbox { display: grid; gap: 2px; margin-bottom: 18px; }
 .gallery figure { margin: 0; background: var(--white); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: grid; }
 .gallery button { border: 0; padding: 0; background: #E9E1C8; cursor: zoom-in; display: block; }
 .gallery img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
@@ -282,7 +290,11 @@ footer a { color: #fff; }
         <p class="eyebrow">Galeri</p>
         <h2>Dokumentasi kegiatan dan informasi</h2>
       </div>
-      <div class="gallery" id="list-galeri"></div>
+      <div class="gallery-wrap">
+        <button type="button" class="gal-nav prev" id="gal-prev" aria-label="Foto sebelumnya">&#8249;</button>
+        <div class="gallery" id="list-galeri" tabindex="0" aria-label="Galeri foto, geser untuk melihat foto lainnya"></div>
+        <button type="button" class="gal-nav next" id="gal-next" aria-label="Foto berikutnya">&#8250;</button>
+      </div>
       <p class="note" id="galeri-empty">Foto kegiatan akan ditampilkan di sini.</p>
     </div>
   </section>
@@ -317,7 +329,7 @@ footer a { color: #fff; }
         <p class="eyebrow">Jadwal sholat</p>
         <h2>Jadwal sholat Kota Cirebon hari ini</h2>
       </div>
-      <p class="note" id="prayer-date">Memuat jadwal...</p>
+      <div class="clockbox"><div class="clock" id="clock" aria-label="Jam sekarang">--:--:--<small>WIB</small></div><p class="note" id="prayer-date" style="margin:0">Memuat jadwal...</p></div>
       <div class="prayer" id="prayer" aria-live="polite"></div>
       <p class="note" style="margin-top:14px">Perhitungan mengikuti metode Kementerian Agama RI (sumber: Aladhan). Untuk jadwal resmi dan kota lain, lihat <a href="https://bimasislam.kemenag.go.id/jadwalshalat" target="_blank" rel="noopener">Bimas Islam Kemenag</a>.</p>
     </div>
@@ -333,7 +345,6 @@ footer a { color: #fff; }
       <p class="note" id="berita-empty">Berita pilihan akan ditampilkan di sini.</p>
       <h3 class="sub-h" style="margin-top:28px">Baca berita terkini</h3>
       <div class="links">
-        <a class="btn btn-line" href="https://www.nu.or.id/" target="_blank" rel="noopener">NU Online</a>
         <a class="btn btn-line" href="https://kemenag.go.id/" target="_blank" rel="noopener">Kemenag RI</a>
         <a class="btn btn-line" href="https://www.antaranews.com/" target="_blank" rel="noopener">ANTARA (nasional)</a>
         <a class="btn btn-line" href="https://www.antaranews.com/jabar" target="_blank" rel="noopener">ANTARA Jawa Barat</a>
@@ -352,7 +363,6 @@ footer a { color: #fff; }
       <h3 class="sub-h" style="margin-top:28px">Pustaka digital</h3>
       <div class="links">
         <a class="btn btn-line" href="https://quran.kemenag.go.id/" target="_blank" rel="noopener">Al-Qur'an Kemenag</a>
-        <a class="btn btn-line" href="https://www.nu.or.id/" target="_blank" rel="noopener">Khazanah NU Online</a>
         <a class="btn btn-line" href="https://kemenag.go.id/" target="_blank" rel="noopener">Kemenag RI</a>
       </div>
     </div>
@@ -602,8 +612,15 @@ var PKBM_DATA = { pengurus: [], jadwal: [], siswaMode: 'count', siswa: [], siswa
       f.appendChild(c); box.appendChild(f);
     });
     document.getElementById('galeri-empty').hidden = !!box.children.length;
+    var many = box.scrollWidth > box.clientWidth + 4;
+    document.getElementById('gal-prev').hidden = document.getElementById('gal-next').hidden = !many;
   };
   (function () {
+    var box = document.getElementById('list-galeri');
+    function step(d) { box.scrollBy({ left: d * Math.max(260, box.clientWidth * 0.8), behavior: 'smooth' }); }
+    document.getElementById('gal-prev').addEventListener('click', function () { step(-1); });
+    document.getElementById('gal-next').addEventListener('click', function () { step(1); });
+    box.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') step(1); if (e.key === 'ArrowLeft') step(-1); });
     var dlg = document.getElementById('lightbox');
     document.getElementById('lb-close').addEventListener('click', function () { dlg.close(); });
     dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
@@ -631,8 +648,16 @@ var PKBM_DATA = { pengurus: [], jadwal: [], siswaMode: 'count', siswa: [], siswa
       });
       info.textContent = dateText + ' (WIB)';
     }
+    var clock = document.getElementById('clock');
+    function tick() {
+      var t = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/\./g, ':');
+      clock.firstChild.nodeValue = t;
+    }
+    tick(); setInterval(tick, 1000);
+    setInterval(function () { if (window.__prayerT) show(window.__prayerT, window.__prayerD); }, 60000);
     fetch(url).then(function (r) { return r.json(); }).then(function (j) {
       var d = j.data, g = d.date.gregorian, h = d.date.hijri;
+      window.__prayerT = d.timings; window.__prayerD = g.weekday.en + ', ' + g.date + ' / ' + h.day + ' ' + h.month.en + ' ' + h.year + ' H';
       show(d.timings, g.weekday.en + ', ' + g.date + ' / ' + h.day + ' ' + h.month.en + ' ' + h.year + ' H');
     }).catch(function () {
       info.textContent = 'Jadwal belum bisa dimuat. Silakan buka Bimas Islam Kemenag di bawah.';
